@@ -9,6 +9,7 @@ import com.github.javaparser.ast.modules.ModuleProvidesDirective;
 import com.github.javaparser.ast.modules.ModuleRequiresDirective;
 import com.github.javaparser.ast.modules.ModuleUsesDirective;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -301,7 +302,12 @@ public class BuildImage extends AbstractMojo {
 
             printLines(lines);
 
-            Path appDir = Path.of(target, name + ".app");
+            Path appDir;
+            if (SystemUtils.IS_OS_MAC) {
+                appDir = Path.of(target, name + ".app");
+            } else {
+                appDir = Path.of(target, name);
+            }
             if (Files.exists(appDir)) {
                 System.out.println("Deleting: " + appDir);
                 FileUtils.deleteDirectory(appDir.toFile());
