@@ -8,6 +8,7 @@ import com.github.javaparser.ast.modules.ModuleExportsDirective;
 import com.github.javaparser.ast.modules.ModuleProvidesDirective;
 import com.github.javaparser.ast.modules.ModuleRequiresDirective;
 import com.github.javaparser.ast.modules.ModuleUsesDirective;
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -303,7 +304,7 @@ public class BuildImage extends AbstractMojo {
             Path appDir = Path.of(target, name + ".app");
             if (Files.exists(appDir)) {
                 System.out.println("Deleting: " + appDir);
-                deleteDir(appDir);
+                FileUtils.deleteDirectory(appDir.toFile());
             }
 
             System.out.println("Result:");
@@ -372,7 +373,7 @@ public class BuildImage extends AbstractMojo {
     }
 
     private static void extract(Path jar, Path out) throws IOException {
-        deleteDir(out);
+        FileUtils.deleteDirectory(out.toFile());
         System.out.println("Extract: " + jar);
         JarFile jarFile = new JarFile(jar.toString());
         Iterator<JarEntry> iterator = jarFile.entries().asIterator();
@@ -470,32 +471,6 @@ public class BuildImage extends AbstractMojo {
             element = null;
         }
         return element;
-    }
-
-    private static void deleteDir(Path dir) throws IOException {
-        Files.walkFileTree(dir, new FileVisitor<>() {
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                Files.delete(file);
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-                return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                Files.delete(dir);
-                return FileVisitResult.CONTINUE;
-            }
-        });
     }
 
     private static void printLines(List<List<String>> lines) {
