@@ -142,6 +142,12 @@ public class BuildImage extends AbstractMojo {
     @Parameter(property = "verbose", readonly = true)
     private boolean verbose;
 
+    // --icon `icon file path`
+    // Path of the icon of the application bundle (absolute path or relative to the
+    // current directory).
+    @Parameter(property = "applicationImageIcon", readonly = true)
+    private String applicationImageIcon;
+
     private SortedMap<String, SortedSet<String>> graph = new TreeMap<>();
 
     @Override
@@ -521,6 +527,10 @@ public class BuildImage extends AbstractMojo {
         cmdArray.addAll(asList("--module-path", modulePath));
         cmdArray.addAll(asList("--module", mainClass));
         cmdArray.addAll(asList("--dest", target));
+
+        if (applicationImageIcon != null) {
+            cmdArray.addAll(asList("--icon", applicationImageIcon));
+        }
 
         if (verbose) {
             cmdArray.add("--verbose");
